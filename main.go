@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +19,7 @@ var (
 	version     string
 	gitCommit   string
 	counter     int
+	forever     bool
 	proxy       string
 	timeout     string
 	interval    string
@@ -117,6 +119,10 @@ var rootCmd = cobra.Command{
 			ping.UseCustomeDNS(dnsServer)
 		}
 
+		if forever {
+			counter = math.MaxInt
+		}
+
 		parseHost := ping.FormatIP(host)
 		target := ping.Target{
 			Timeout:  timeoutDuration,
@@ -163,6 +169,7 @@ var rootCmd = cobra.Command{
 func init() {
 	rootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")
 	rootCmd.Flags().IntVarP(&counter, "counter", "c", 4, "ping counter")
+	rootCmd.Flags().BoolVarP(&forever, "forever", "t", false, "continue sending request messages to the destination until interrupted")
 	rootCmd.Flags().StringVar(&proxy, "proxy", "", "Use HTTP proxy")
 	rootCmd.Flags().StringVarP(&timeout, "timeout", "T", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
 	rootCmd.Flags().StringVarP(&interval, "interval", "I", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
